@@ -1,0 +1,68 @@
+---
+title: "3/30/20 notes edld 610"
+author: "JP"
+date: "3/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Notes
+
+## Introduce Yourself
+1. JP
+2. I wanted to take it last year but I wanted to finish my required course material.
+3. Slowly losing it, but started baking bread, making pizza, and cooking
+4. furry friend is lucy
+
+## Notes
+
+## Basic Data Types
+
+### Vectors
+
+- whole number is an integer, while doubles are numbers that can be between integers (floating, 6.47)
+
+### function to create vector
+- `c` is the function to create vectors
+
+### list not a vector
+- list is a vector
+
+### difference between matrix and data frame
+- matrix is a vector with dimension attribute, everything has to be of the same type, everything is double
+- data frame, every column could be of a different type (integer, double, character, etc)
+
+### coercion mean
+- implicit and explicit coercion
+- you have a vector, with characters and integers
+- if this way, it will be coerced into the simplier type, a single type
+
+- changing `is.numeric` may not be best to `is.integer` or `is.double`
+- most times it will be okay with just `is.numeric`
+
+--- 
+## Coercion
+- character in a vector, everything will be implicitly coerced into characters
+
+### Explicit coercion
+- can make whatever vector you want
+
+---
+## checking types
+`typeof` function to see what type of vector each are
+
+---
+## piping
+```{r}
+library(magrittr)
+
+typeof(as.integer(c(7L, 3.25)))
+
+c(7L, 3.25) %>% 
+  as.integer() %>% 
+  typeof()
+```
+
