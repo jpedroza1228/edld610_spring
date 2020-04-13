@@ -1,0 +1,333 @@
+---
+title: "4/1/20 notes"
+author: "JP"
+date: "4/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#4/1/20 notes
+
+logical is the least flexible, the second least is integer becuase 
+
+
+```{r}
+character <- c('a', 'b', 'c')
+double <- c(4.1, 1.56, 3.67)
+logical <- c(TRUE, FALSE, FALSE)
+integer <- c(2L, 4L, 6L)
+
+combine <- c(logical, integer)
+typeof(combine)
+
+logical_character <- as.character(logical)
+typeof(logical_character)
+```
+
+## Attributes
+
+metadata, what's metadata
+
+metadata is data of the data
+
+column names or dimensions
+2x3 matrix are the dimensions, whcih are attributes to the vector
+
+arbitrary metadata, such as comments
+
+## Other data types
+atomic vectors, are the smallest unit, everything in R is from the atomic vectors
+
+### data types
+array is like a matrix, but with more than 2 dimensions
+matrices stacked on top of one another
+
+use attributes to create data types
+
+```{r}
+attributes(iris)
+```
+
+names attributes, class, and row.names
+
+```{r}
+attr(iris, 'class')
+```
+
+extracts the attribute specifically. wouldn't use this naturally, you'd use the `names(iris)` funciton
+
+sttributes of a specific column may be wanted
+
+```{r}
+attributes(iris$Species)
+```
+
+species has its own levels and it has its own class, which it is a factor
+
+Can set attributes
+```{r}
+attr(iris$Species, 'levels') <- c('red', 'green', 'blue') 
+
+head(iris)
+```
+
+you would use the levels function, which is an easier way of using the attr function
+
+## Dimensions
+
+```{r}
+m <- matrix(1:6, ncol = 2)
+m
+```
+
+the matrix fills downward from column 1 to column 
+
+```{r}
+attributes(m)
+```
+
+it gives you 3 rows and 2 columns
+
+always will tell you rows first then columns, if an array, then it would give you the depths
+
+```{r}
+attr(m, 'dim') <- c(2, 3)
+attributes(m)
+m
+```
+
+the reason why the numbers are in this order is because it follows the same attributes
+
+```{r}
+v <- 1:6
+v
+
+attr(v, 'dim') <- c(3, 2)
+v
+```
+
+```{r}
+matrix(6:13, ncol = 2, byrow = TRUE)
+
+```
+
+list has two atomic vectors
+
+## arbitrary metadata
+```{r}
+attr(v, 'matrix_mean') <- mean(v)
+v
+```
+
+you can store anything in attributes, there are some cases where you may want to, but most operations will strip those attributes
+
+```{r}
+rowSums(v)
+
+attributes(rowSums(v))
+```
+names are maintained, but everything else is not maintained due to the operation.
+
+## Names 
+
+function for names
+
+colnames are the column names, rownames are rows
+
+names 
+```{r}
+names(v)
+
+names(v) <- letters[1:6]
+
+attributes(v)
+```
+
+## Factors implementation
+factors are combination of characters and integer vectors
+
+factors are integers at the base, with characters as the level, every level is assocaited with an integer
+```{r}
+fct <- factor(c('a', 'a', 'b', 'c'))
+typeof(fct)
+
+attributes(fct)
+
+str(fct)
+```
+
+## dates
+
+```{r}
+date <- Sys.Date()
+typeof(date)
+
+date
+
+attributes(date)
+
+attributes(date) <- NULL
+date
+```
+this value is the days that have passed since January 1st 1970, unix epoch
+
+## Missing values
+```{r}
+NA > 5
+
+NA*7
+
+NA == NA
+
+NA | TRUE
+
+x <- c(NA, 3, NA, 5)
+
+is.na(x)
+```
+
+NA means R doesn't know. There is no way to state that one missing value is equal to another missing value.
+
+Since there is TRUE, there is obviously one value that fits TRUE, so it will be TRUE no matter what.
+
+Tidyverse has drop_na to get rid of issues with NA in base R
+
+# Lists
+```{r}
+list('a', 7L, 3.25, TRUE)
+```
+
+lists are vectors, not atomic vectors, they are packages around the atomic vectors
+
+lists can have all different vectors and will store fine with them all, as seen in the example above.
+
+Each element in the list can be different vector lengths. Each atomic vectors have their own attributes in the list. 
+
+Lists can be stored within another list.
+```{r}
+l <- list(c('a', 'b', 'c'),
+          rnorm(5),
+          c(7L, 2L),
+          c(TRUE, TRUE, FALSE, FALSE))
+
+l
+
+str(l)
+```
+
+data frames are a special type of list. Normal dataframes, where each column is an element of the list.
+
+In a dataframe, each column in the list has to have the same amount of elements.
+
+All dataframes are just lists, nicer to work with way.
+
+## Subsetting
+```{r}
+x <- c(a = 3, b = 5, c = 7)
+attributes(x)
+
+l <- list(x = x, 
+          x2 = c(x, x), 
+          x3 = list(vect = x,
+                    squared = x^2,
+                    cubed = x^3))
+
+x['a']
+x[1]
+```
+elements of x have names, therefore you can subset by those names
+
+```{r}
+fct['b']
+
+fct[3]
+
+fct[factor('b')]
+```
+
+the last one gives you a because it is creating a new factor, b
+you should probably subset by levels for factors
+
+
+## subsetting lists
+
+common ways are with $, [], or [[]]
+
+
+```{r}
+l[1]
+
+typeof(l[1])
+
+l[[1]]
+
+typeof(l[[1]])
+
+l[[1]]['c']
+# this gives the vector in return, then looking into c gives you the value for c, which is 7
+```
+
+## Named lists
+
+```{r}
+l$x2
+
+l$x3
+l[[3]]
+
+l$x3$squared
+
+l$x3$squared$b
+l$x3$squared['b']
+```
+
+```{r}
+l[c(TRUE, FALSE, TRUE)]
+```
+
+## careful with brackets
+```{r}
+l[[c(TRUE, FALSE, FALSE)]]
+```
+
+its expecting that there are three different vectors here. Trying to index a list, going into the first car, but don't worry about the second and third cars, but you're already in the first car, so you can't go to the other cars when you're in the first car. 
+
+##subsetting in multiple dimensions
+```{r}
+head(mtcars)
+
+mtcars[3, 4]
+
+#whole column
+mtcars[, 4]
+
+# 4th row
+mtcars[4, ]
+
+mtcars[4, c('mpg', 'hp')]
+mtcars[4, ] [c('mpg', 'hp')]
+
+mtcars[ ,4, drop = FALSE]
+
+mtcars_tbl <- tibble::as_tibble(mtcars)
+mtcars_tbl
+
+mtcars_tbl[ ,4, drop = TRUE]
+```
+last one `mtcars[ ,4, drop = FALSE]`, if you expect to get a dataframe, then you need to put some additional arguments 
+
+
+## LM
+```{r}
+lm <- lm(mpg ~ hp, mtcars)
+str(lm)
+```
+
+
+
+
+
+

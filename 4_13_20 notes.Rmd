@@ -1,0 +1,109 @@
+---
+title: "4_13_20 notes"
+author: "JP"
+date: "4/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 4/13/20 notes for EDLD 610 - Func Prog
+
+```{r}
+install.packages('patchwork')
+```
+
+patchwork is a package that can be used to organize plots on a slide/page.
+
+Tidyeval is created to try and help with writing functions. However, it is still more difficult than base r.
+
+```{r}
+library(tidyverse)
+```
+
+# Purr
+
+purr will return a list using `map` functional.
+
+map is the equivalent of using lapply
+
+using `~` is usful for shortcuts in purrr, it removes the `function(x)` in code
+
+rather than `x`, you'd use `.x`
+
+# Purr Variants
+
+`map_dbl`, `map_int`, `map_char`, `map_lgl`
+
+these will return the atomic vectors described in each variant
+
+map will always return a list though
+
+## Activity
+
+```{r}
+econ <- economics %>% 
+  mutate(year = lubridate::year(date))
+
+econ
+
+by_year <- split(econ, econ$year)
+
+str(by_year)
+
+names(economics)
+```
+
+```{r model building}
+# pce --> unemployment percentage over time
+
+# don't need the code below because you don't need to have this prior to looping since this is using map. This is for for functions.
+# year_finding <- rep(NA, length(by_year))
+
+year_per <- map(by_year, ~mutate(.x, percent = unemploy/pop))
+
+
+# models for each year
+model <- map(year_per, ~lm(percent ~ pce, data = .x))
+
+str(model)
+
+
+#getting coefficients for each year
+coef_mod <- map(model, ~coef(.x))
+# same thing
+# coef_mod <- map(model, coef)
+
+str(coef_mod)
+
+coef_mod[c(1:2, length(coef_mod))]
+
+
+
+
+# extracting slopes
+pce_only <- map(coef_mod, 'pce')
+# if you want a single vector, pce is all double
+pce_only <- map_dbl(coef_mod, 'pce')
+
+pce_only
+```
+
+**Remember to put in the `~` as this is the equivalent of using the function(x)**
+
+piping can be used for purr functions
+
+
+
+
+`map_lbl` can be used to examine columns that are only of a certain atomic vector, in this case, only looking at numeric columns. 
+```{r}
+map_lgl(iris, is.numeric)
+```
+
+
+
+
+
