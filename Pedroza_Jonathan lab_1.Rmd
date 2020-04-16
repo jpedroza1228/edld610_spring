@@ -61,16 +61,12 @@ l[['a']]['m']
 
 l[['a']][['m']][, 3]
 
-m <- matrix(1:12, ncol = 3)
-m[, 3]
 
 
 l[['b']][7, 2]
-
 l$b[7, 2]
 
 ```
-
 
 ## Loops
 
@@ -81,7 +77,7 @@ airquality <- airquality %>%
 
 by_month <- split(airquality, airquality$month)
 
-by_month
+# by_month
 
 typeof(by_month)
 ```
