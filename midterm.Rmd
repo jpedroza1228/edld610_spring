@@ -1,0 +1,70 @@
+---
+title: "Midterm"
+author: "JP"
+date: "4/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+
+# install.packages('glue')
+```
+
+# EDLD 610 - Functional Programming Midterm
+
+```{r}
+download_file <- function(year) {
+    link <- glue::glue("https://www.oregon.gov/ode/educator-resources/assessment/TestResults20{year}/pagr_schools_ela_raceethnicity_{year-1}{year}.xlsx")
+    rio::import(link, setclass = "tibble", na = c("-", "--", "*"))
+}
+
+```
+
+1. (10 points) Use the function above to download all the data from 2014-15 to each of the past 4 school years and bind it into a single data frame, using a single function (i.e., one line of code). Note, this may take a minute or two to run, depending on your Internet speed.
+
+```{r}
+library(tidyverse)
+
+# need to think through how to do this in a programming way
+
+data <- map_df(c(15, 16, 17, 18), 
+               ~download_file(.x), .id = 'level') %>% 
+  janitor::clean_names()
+
+```
+
+Conduct some basic data cleaning to make your data file look like the following.
+
+* Filter for only student groups coded as "White" or "Hispanic/Latino".
+* Select variables related to the number of students in each of the levels (1:4), and not percentages or collapsed levels.
+* Remove any row that has missing data in any of the n variables
+
+
+```{r}
+data$student_group <- str_to_lower(data$student_group)
+
+data_sub <- data %>% 
+  filter(student_group == 'white' |
+           student_group == 'hispanic/latino') %>% 
+  dplyr::select(level:grade_level,
+                number_level_1,
+                number_level_2,
+                number_level_3,
+                number_level_4) %>% 
+  drop_na(starts_with('number_level'))
+
+```
+
+2. (10 points) Collapse (sum) the n across grades and school for each district within each academic year, student group, and level. At the same time, calulate the number of schools (unique schools listed) for each district. Also move your data to a wider format where the student groups become new columns, filled by the district n. Remove districts that did not report numbers for one or both student groups (i.e., drop missing data from the new columns). Your data frame should look like the below
+
+```{r}
+data_sub %>% 
+  count(number_level_1)
+```
+
+
+Plots should look somewhat similar to the one that daniel created.
+
+Plots will change for each school district, and the number of schools in the note.
+
