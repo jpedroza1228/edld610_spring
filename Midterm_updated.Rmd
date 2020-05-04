@@ -1,10 +1,8 @@
 ---
 title: "Midterm"
 author: "JP"
-date: "4/20/2020"
-output:
-  html_document: default
-  pdf_document: default
+date: "5/4/2020"
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -135,6 +133,7 @@ v <- eth_diff %>%
 dists <- unique(v$district)[1:100]
 
 plots <- v %>% 
+  as_tibble() %>% 
   filter(district %in% dists)
 ```
 
@@ -199,5 +198,3 @@ walk2(paths, all_plots$plots, ggsave,
       height = 6.5,
       dpi = 500)
 ```
-
-
