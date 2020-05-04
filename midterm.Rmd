@@ -7,7 +7,7 @@ output:
   pdf_document: default
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = TRUE}
 knitr::opts_chunk$set(cache = TRUE)
 
 # install.packages('glue')
@@ -141,13 +141,15 @@ plots <- v %>%
 ```{r}
 bandon_plot <- plots %>% 
   filter(district == 'Bandon SD 54') %>% 
-  ggplot(aes(as.factor(academic_year), v)) +
+  ggplot(aes(academic_year, v)) +
+  geom_point(color = 'dodgerblue') +
+  geom_path(aes(x = as.numeric(as.factor(academic_year)))) +
   geom_line(color = 'gray70') +
   geom_errorbar(aes(ymin = v - v_se, 
                     ymax = v + v_se)) +
   geom_hline(yintercept = 0,
              color = "red") +
-  geom_point(color = 'dodgerblue') +
+  
   theme_minimal() +
   labs(x = 'School Year',
        y = 'Average Achievement Difference (SD units)',
@@ -166,12 +168,15 @@ all_plots <- left_join(plots, n_schools) %>%
            group_by(district, label_gap_est, label_note) %>% 
            nest() %>% 
   mutate(plots = pmap(list(district, label_gap_est, label_note, data),
-                      ~ggplot(..4, aes(as.factor(academic_year), v)) + geom_line(color = 'gray70') +
-  geom_errorbar(aes(ymin = v - v_se, 
+                      ~ggplot(..4, aes(academic_year, v)) +
+                        geom_point(color = 'dodgerblue') +
+                        geom_path(aes(x = as.numeric(as.factor(academic_year)))) +
+                        geom_line(color = 'gray70') +
+                        geom_errorbar(aes(ymin = v - v_se, 
                     ymax = v + v_se)) +
-  geom_hline(yintercept = 0,
+                      geom_hline(yintercept = 0,
              color = "red") +
-  geom_point(color = 'dodgerblue') +
+  
   theme_minimal() +
   labs(x = 'School Year',
        y = 'Average Achievement Difference (SD units)',
