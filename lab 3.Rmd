@@ -1,0 +1,153 @@
+---
+title: "Lab 3"
+author: "JP"
+date: "5/6/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lab 3
+
+Part A: Foundations
+
+1. Briefly name and describe the three fundamental components of a function.
+
+2. Describe three different ways functions can be stored/applied and an example of when you might want to use each version.
+
+Part B: Applied practice
+The mean is defined as
+
+$$ ∑ni=1xin $$
+
+where xi represents each element in a generic vector, x, ∑ represents the summation of these elements, and n represents the total number of elements in x. In other words, sum and divide by the number included.
+
+1. Write a function to calculate the mean that removes missing data before conducting the calculation. You may not use base::mean or any similar function that conducts a mean calculation.
+
+```{r}
+mean2 <- function(x) {
+  z <- na.omit(x)
+  sum(z)/length(z)
+}
+
+inspectdf::inspect_na(airquality)
+
+```
+
+2. Test your function to make sure it (a) provides the expected results, and (b) gives identical output to base::mean when na.rm = TRUE. Make sure that you test your data against a vector that has missing data.
+
+```{r}
+mean2(airquality$Solar.R)
+mean(airquality$Solar.R, na.rm = FALSE)
+mean(airquality$Solar.R, na.rm = TRUE)
+```
+
+3. Write a function that takes two vectors of the same length and returns the total number of instances where the value is NA for both vectors. For example, given the following two vectors
+
+```{r}
+c(1, NA, NA, 3, 3, 9, NA)
+c(NA, 3, NA, 4, NA, NA, NA)
+```
+
+
+The function should return a value of 2, because the vectors are both NA at the third and seventh locations.
+
+Test that the function works as expected on two new vectors (i.e., any two vectors that are not the two listed above).
+
+```{r}
+na1 <- c(1, 7, 3, NA, NA, NA, 7, NA, 9)
+na2 <- c(1, NA, 3, NA, 5, 6, 7, NA, NA)
+
+na <- function(x, y) {
+  sum(is.na(x) & is.na(y))
+}
+
+na(na1, na2)
+
+
+na3 <- c(3, 7, 3, NA, NA, NA, 7, NA, NA)
+na4 <- c(1, NA, 3, NA, 5, 6, 7, NA, NA)
+
+na(na3, na4)
+
+```
+
+
+4. Turn the following three lines of code into three different functions. Make sure to give them meaningful names. Test the functions to make sure they provide the expected output.
+
+```{r}
+# Count number of missing elements in a vector
+sum(is.na(airquality$Ozone))
+
+count_missing <- function(x) {
+ sum(is.na(x)) 
+}
+
+count_missing(airquality$Solar.R)
+
+# Proportional representation of each level (unique element) in a vector
+purrr::map_dbl(split(mtcars$cyl, mtcars$cyl), length) / length(mtcars$cyl)
+
+prop_level <- function(x) {
+ purrr::map_dbl(split(x, x), length)/length(x)
+}
+
+prop_level(mtcars$cyl)
+
+# normalize or z-score a vector so the mean is zero and sd is one
+(mtcars$mpg - mean(mtcars$mpg, na.rm = TRUE)) / 
+  sd(mtcars$mpg, na.rm = TRUE) 
+
+z_distribution <- function(x) {
+ mean_col <- mean(x, na.rm = TRUE)
+ sd_col <- sd(x, na.rm = TRUE)
+  (x - mean_col)/sd_col
+}
+
+z_distribution(mtcars$mpg)
+```
+
+
+5. Write a function that takes a data frame as its input and returns a data frame with only the numeric columns.
+
+```{r}
+head(iris)
+
+# x is usually a placeholder for a vector
+# df 
+
+numeric_only <- function(df) {
+  numeric_col <- purrr::map_lgl(df, is.numeric) 
+  return(numeric_col)
+}
+
+numeric_only(iris)
+
+library(tidyverse)
+
+iris[numeric_only(iris)]
+```
+
+
+6. Write a function that uses the function you wrote in Question 5, and returns a data frame with the mean and standard deviation of each numeric column.
+
+```{r}
+df_mean_sd <- function(df) {
+  mean_df <- mean(numeric_only(df))
+  sd_df <- sd(numeric_only(df))
+  
+  map_mean <- map(df, mean_df)
+  map_sd <- map(df, sd_df)
+  
+  mean_num <- map_dbl(df, map_mean)
+  sd_num <- map_dbl(df, map_sd)
+  
+  as.data.frame(mean_num)
+}
+
+df_mean_sd(iris)
+```
+
+
