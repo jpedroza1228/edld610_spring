@@ -135,19 +135,16 @@ iris[numeric_only(iris)]
 
 ```{r}
 df_mean_sd <- function(df) {
-  mean_df <- mean(numeric_only(df))
-  sd_df <- sd(numeric_only(df))
+  numeric_col <- purrr::map_lgl(df, is.numeric) 
+  mean_map <- map_dbl(df[numeric_col], mean)
+  sd_map <- map_dbl(df[numeric_col], sd)
   
-  map_mean <- map(df, mean_df)
-  map_sd <- map(df, sd_df)
-  
-  mean_num <- map_dbl(df, map_mean)
-  sd_num <- map_dbl(df, map_sd)
-  
-  as.data.frame(mean_num)
+  data.frame(mean_map, sd_map)
+
 }
 
 df_mean_sd(iris)
+
 ```
 
 
