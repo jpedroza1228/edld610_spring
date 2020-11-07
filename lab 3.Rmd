@@ -15,7 +15,22 @@ Part A: Foundations
 
 1. Briefly name and describe the three fundamental components of a function.
 
+The three fundamental components of a function are the body, formals, and the environment. 
+
+The body is everything within the function. So whatever operations the function completes will be done within the body. It is also everything that is within the curly brackets. 
+
+The formals are the arguments supplied to the function. It is the place where the placeholders for the body of the function are supplied. 
+
+The environment is where the function is defined. An example are common statistical tests that are built into R having the stats package as the environment. 
+
 2. Describe three different ways functions can be stored/applied and an example of when you might want to use each version.
+
+Functions can be applied  by having the function calculate the value that was created within the function. Such as having a function that is used for one reason. One example could be to have a function that subtracts the mean of each variable to center variables. 
+
+Secondly, you can create objects within a function and then the last line of the function would be using the objects to calculate a value. This would be used if you have a more complex function that requires steps to get to the value(s) needed. An example would be to calculate two values (mean and standard deviation) by creating objects for both and then getting those values from the objects you created. 
+
+Lastly, you can store a function with conditions and with a return. This would allow you to be more specific with the function created. An example of when this would be used would be using conditions to work with a specific type of vector and making sure the value you get from the function would only be that type of vector, such as character by only returning characters when running the function. 
+
 
 Part B: Applied practice
 The mean is defined as
@@ -31,8 +46,6 @@ mean2 <- function(x) {
   z <- na.omit(x)
   sum(z)/length(z)
 }
-
-inspectdf::inspect_na(airquality)
 
 ```
 
@@ -113,10 +126,6 @@ z_distribution(mtcars$mpg)
 5. Write a function that takes a data frame as its input and returns a data frame with only the numeric columns.
 
 ```{r}
-head(iris)
-
-# x is usually a placeholder for a vector
-# df 
 
 numeric_only <- function(df) {
   numeric_col <- purrr::map_lgl(df, is.numeric) 
@@ -127,13 +136,15 @@ numeric_only(iris)
 
 library(tidyverse)
 
-iris[numeric_only(iris)]
+head(iris[numeric_only(iris)])
 ```
 
 
 6. Write a function that uses the function you wrote in Question 5, and returns a data frame with the mean and standard deviation of each numeric column.
 
 ```{r}
+# psych::describe(iris)
+
 df_mean_sd <- function(df) {
   numeric_col <- purrr::map_lgl(df, is.numeric) 
   mean_map <- map_dbl(df[numeric_col], mean)

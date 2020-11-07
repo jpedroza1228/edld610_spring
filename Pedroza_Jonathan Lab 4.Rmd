@@ -1,0 +1,81 @@
+---
+title: "Lab 4"
+author: "JP"
+date: "5/26/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Writing a summary function
+Write a function that takes a given data frame as its first argument, a column to summarize as its second argument, and any set of other columns to summary operations by as the third argument.
+
+Function behavior
+By default, the function should report:
+
+Total number of observations
+Number of non-missing observations
+Number of missing observations
+Mean
+Standard deviation
+Minimum
+Maximum
+However, the function should be flexible so it can take any function(s) as its input to summarize by, provided the function results in a single value (e.g., anything you could feed to dplyr::summarize). You’ll need an additional optional argument (should be the last argument in your function) that lists the function(s) to use in the summary. Hint: You’ll want to have this argument pre-populated with default functions.
+
+Errors
+Embed an error if
+
+Anything other than a data frame is supplied as the first argument
+The provided column to summarize is not numeric.
+Warnings
+Embed a warning if
+
+Any of the grouping variable(s) are numeric (generally you would expect the grouping variable to be a categorical variable)
+Some guidance
+If you want to use {dplyr} you’ll need to use non-standard evaluation (NSE), so either something like !!enquo(group_var), where group_var is the formal argument of your function, or {{group_var}}. Also, dplyr::pull (together with NSE) will likely be helpful for checking types for warnings/errors.
+
+Alternatively, you might consider spliting the dataset by the grouping variable, then looping over each split to apply the function(s) supplied.
+
+```{r}
+library(tidyverse)
+
+grouped_summarized <- function(df, 
+                               group_var, 
+                               summarized_var, 
+                               functions = list(n = ~length(.),
+                                            valid_cases = ~sum(!is.na(.)),
+                                            missing_cases = ~sum(is.na(.)),
+                                            mean_var = ~mean(.),
+                                            sd_var = ~sd(.),
+                                            min_var = ~min(.),
+                                            max_var = ~max(.))
+                               ){
+  if(!is.data.frame(df)) {
+        stop("Data must be in the form of a data frame.")
+    }
+    if(!is.numeric(pull(df, {{summarized_var}}))) {
+        stop("Summarized column needs to be numeric.")
+    }
+    if(is.numeric(pull(df, {{group_var}}))) {
+        warning("The grouping variable is numeric. Change the numeric value to be a factor.")
+    }
+  
+  df %>% 
+    group_by({{group_var}}) %>% 
+    summarize_all(functions)
+}
+
+iris %>% 
+  grouped_summarized(Species, Sepal.Width)
+
+airquality %>%
+    mutate(Month = as.factor(Month)) %>%
+    grouped_summarized(Month, Ozone)
+
+```
+
+
+
+
